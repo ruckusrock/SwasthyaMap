@@ -1,0 +1,13 @@
+{
+  "name": "swasthyamap",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SwasthyaMap healthcare location map",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file=map_api.env server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}

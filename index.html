@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SwasthyaMap — Free Healthcare Near You</title>
+<link rel="preconnect" href="https://maps.googleapis.com">
+<link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- First-use privacy and terms gate. Edit the paragraph below as needed. -->
+<div class="modal-overlay" id="policyModal">
+  <div class="modal-card policy-card">
+    <a class="policy-link" href="#policyModal">Privacy policy &amp; Terms of use</a>
+    <h2>Before you continue</h2>
+    <p class="policy-text" id="privacy-policy">SwasthyaMap provides healthcare location information for general guidance only. While the possibility is low, information may be incomplete, outdated, or inaccurate, and is not medical advice. By continuing, you agree to use this service at your own discretion. SwasthyaMap is not liable for any damages arising from the use of this service. We may store information you submit, such as facility details and photographs anonymously, to publish and improve this service. Please do not submit sensitive personal or medical information.</p>
+    <button class="btn-primary full" id="policyAgree">I agree and continue</button>
+  </div>
+</div>
+
+<!-- First-launch language picker -->
+<div class="modal-overlay hidden" id="langModal">
+  <div class="modal-card">
+    <h2 data-i18n="chooseLanguage">Choose your language</h2>
+    <p class="muted" data-i18n="chooseLanguageSub">You can change this anytime.</p>
+    <div class="lang-grid">
+      <button class="lang-option" data-lang="en"><span class="lang-native">English</span><span class="lang-en">English</span></button>
+      <button class="lang-option" data-lang="hi"><span class="lang-native">हिन्दी</span><span class="lang-en">Hindi</span></button>
+      <button class="lang-option" data-lang="ta"><span class="lang-native">தமிழ்</span><span class="lang-en">Tamil</span></button>
+      <button class="lang-option" data-lang="bn"><span class="lang-native">বাংলা</span><span class="lang-en">Bengali</span></button>
+      <button class="lang-option" data-lang="mr"><span class="lang-native">मराठी</span><span class="lang-en">Marathi</span></button>
+      <button class="lang-option" data-lang="gu"><span class="lang-native">ગુજરાતી</span><span class="lang-en">Gujarati</span></button>
+      <button class="lang-option" data-lang="bgc"><span class="lang-native">हरियाणवी</span><span class="lang-en">Haryanvi</span></button>
+      <button class="lang-option" data-lang="mwr"><span class="lang-native">मारवाड़ी</span><span class="lang-en">Marwari</span></button>
+      <button class="lang-option" data-lang="kn"><span class="lang-native">ಕನ್ನಡ</span><span class="lang-en">Kannada</span></button>
+      <button class="lang-option" data-lang="te"><span class="lang-native">తెలుగు</span><span class="lang-en">Telugu</span></button>
+      <button class="lang-option" data-lang="hng"><span class="lang-native">Hinglish</span><span class="lang-en">Hinglish</span></button>
+    </div>
+    <button class="btn-text" id="langSkip" data-i18n="continueEnglish">Continue in English</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>SwasthyaMap</span>
+    </div>
+    <div class="topbar-actions">
+      <a class="contribute-btn" href="contribute.html" aria-label="Contribute">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span data-i18n="navContribute">Contribute</span>
+      </a>
+      <button class="lang-btn" id="langBtn" aria-label="Change language">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9Z" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span id="langBtnLabel">EN</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Search + location -->
+  <div class="search-row">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m21 21-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Search clinics, camps, services…">
+    </div>
+    <button class="radius-btn" id="radiusBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span id="radiusLabel">5 km</span>
+    </button>
+  </div>
+
+  <!-- Quick shortcuts -->
+  <div class="chip-row" id="chipRow"></div>
+
+  <!-- View toggle -->
+  <div class="view-toggle" role="tablist">
+    <button class="view-tab active" data-view="map" role="tab" data-i18n="mapView">Map</button>
+    <button class="view-tab" data-view="list" role="tab" data-i18n="listView">List</button>
+  </div>
+
+  <!-- Freshness / sync note -->
+  <div class="sync-note">
+    <span class="dot dot-live"></span>
+    <span data-i18n="syncedNow">Updated just now</span>
+    <span class="sep">·</span>
+    <span id="resultCount"></span>
+  </div>
+
+  <!-- Main content -->
+  <main class="content">
+
+    <section class="map-view" id="mapView">
+      <div class="map-canvas" id="mapCanvas"></div>
+      <button class="recenter-btn" id="recenterBtn" aria-label="Recenter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </section>
+
+    <section class="list-view hidden" id="listView">
+      <div class="listing-list" id="listingList"></div>
+      <div class="empty-state hidden" id="emptyState">
+        <p data-i18n="emptyTitle">No results in this radius yet</p>
+        <p class="muted" data-i18n="emptySub">Try a larger radius, or check back soon.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom disclaimer bar -->
+  <div class="disclaimer-bar">
+    <span data-i18n="disclaimer">Information only — not medical advice.</span>
+    <a class="emergency-link" href="tel:108">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span data-i18n="emergency">Emergency: 108</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- Listing detail panel -->
+<div class="detail-overlay" id="detailOverlay">
+  <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true">
+    <button class="detail-close" id="detailClose" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Radius picker -->
+<div class="sheet-overlay" id="radiusSheetOverlay">
+  <div class="sheet">
+    <h3 data-i18n="searchRadius">Search radius</h3>
+    <div class="radius-options" id="radiusOptions"></div>
+  </div>
+</div>
+
+<!-- Report a problem -->
+<div class="sheet-overlay" id="reportSheetOverlay">
+  <div class="sheet">
+    <h3 data-i18n="reportProblem">Report a problem</h3>
+    <p class="muted" data-i18n="reportSub">What's wrong with this listing?</p>
+    <select class="report-select" id="reportReasonSelect">
+      <option value="" data-i18n="reportChoose">Choose an issue</option>
+      <option value="closed_permanently" data-i18n="reportClosedPermanently">Permanently closed</option>
+      <option value="closed_temporarily" data-i18n="reportClosedTemporarily">Temporarily closed</option>
+      <option value="wrong_hours" data-i18n="reportWrongHours">Hours are wrong</option>
+      <option value="wrong_address" data-i18n="reportWrongAddress">Address or location is wrong</option>
+      <option value="wrong_phone" data-i18n="reportWrongPhone">Phone number is wrong</option>
+      <option value="duplicate" data-i18n="reportDuplicate">Duplicate listing</option>
+      <option value="not_healthcare" data-i18n="reportNotHealthcare">Not a healthcare facility</option>
+      <option value="other" data-i18n="reportOther">Something else</option>
+    </select>
+    <textarea class="report-details" id="reportDetailsInput" rows="3" data-i18n-placeholder="reportDetailsPlaceholder" placeholder="Add details (optional)"></textarea>
+    <p class="report-error hidden" id="reportError" data-i18n="reportChooseError">Please choose an issue.</p>
+    <div class="report-actions">
+      <button class="text-btn" id="reportCancelBtn" data-i18n="cancel">Cancel</button>
+      <button class="action-btn primary" id="reportSubmitBtn" data-i18n="reportSubmit">Submit report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Language picker (from header) -->
+<div class="sheet-overlay" id="langSheetOverlay">
+  <div class="sheet">
+    <h3 data-i18n="chooseLanguage">Choose your language</h3>
+    <div class="lang-grid">
+      <button class="lang-option" data-lang="en"><span class="lang-native">English</span><span class="lang-en">English</span></button>
+      <button class="lang-option" data-lang="hi"><span class="lang-native">हिन्दी</span><span class="lang-en">Hindi</span></button>
+      <button class="lang-option" data-lang="ta"><span class="lang-native">தமிழ்</span><span class="lang-en">Tamil</span></button>
+      <button class="lang-option" data-lang="bn"><span class="lang-native">বাংলা</span><span class="lang-en">Bengali</span></button>
+      <button class="lang-option" data-lang="mr"><span class="lang-native">मराठी</span><span class="lang-en">Marathi</span></button>
+      <button class="lang-option" data-lang="gu"><span class="lang-native">ગુજરાતી</span><span class="lang-en">Gujarati</span></button>
+      <button class="lang-option" data-lang="bgc"><span class="lang-native">हरियाणवी</span><span class="lang-en">Haryanvi</span></button>
+      <button class="lang-option" data-lang="mwr"><span class="lang-native">मारवाड़ी</span><span class="lang-en">Marwari</span></button>
+      <button class="lang-option" data-lang="kn"><span class="lang-native">ಕನ್ನಡ</span><span class="lang-en">Kannada</span></button>
+      <button class="lang-option" data-lang="te"><span class="lang-native">తెలుగు</span><span class="lang-en">Telugu</span></button>
+      <button class="lang-option" data-lang="hng"><span class="lang-native">Hinglish</span><span class="lang-en">Hinglish</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

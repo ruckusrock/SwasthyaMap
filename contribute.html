@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Contribute — SwasthyaMap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="contribute.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="Back to map">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 5-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-i18n="contributeTitle">Contribute</span>
+    </a>
+    <button class="lang-btn" id="langBtn" aria-label="Change language">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9Z" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span id="langBtnLabel">EN</span>
+    </button>
+  </header>
+
+  <main class="content contribute-content">
+
+    <!-- STEP: verify mobile number -->
+    <section id="stepAuth" class="panel">
+      <h1 class="panel-title" data-i18n="signInTitle">Verify your mobile number</h1>
+      <p class="muted panel-sub" data-i18n="signInSub">Contributing needs a one-time check. Your number is never shown publicly.</p>
+
+      <div id="authPhoneStage">
+        <div class="field">
+          <label data-i18n="mobileNumberLabel">Mobile number</label>
+          <div class="phone-input">
+            <span class="phone-prefix">+91</span>
+            <input type="tel" id="phoneInput" inputmode="numeric" maxlength="10" data-i18n-placeholder="mobileNumberPlaceholder" placeholder="10-digit mobile number">
+          </div>
+          <p class="field-error hidden" id="phoneError" data-i18n="fieldRequired">Required</p>
+        </div>
+        <button class="btn-primary full" id="sendOtpBtn" data-i18n="sendOtp">Send OTP</button>
+      </div>
+
+      <div id="authOtpStage" class="hidden">
+        <div class="field">
+          <label data-i18n="otpLabel">Enter the 4-digit code</label>
+          <input type="tel" id="otpInput" inputmode="numeric" maxlength="4" class="otp-box-input">
+          <p class="muted small" data-i18n="otpSentNote">Demo mode — enter any 4 digits</p>
+          <p class="field-error hidden" id="otpError" data-i18n="fieldRequired">Required</p>
+        </div>
+        <button class="btn-primary full" id="verifyBtn" data-i18n="verifyContinue">Verify &amp; continue</button>
+        <button class="btn-text center" id="changeNumberBtn" data-i18n="changeNumber">Change number</button>
+      </div>
+    </section>
+
+    <!-- STEP: choose what to add -->
+    <section id="stepChoose" class="panel hidden">
+      <p class="muted panel-sub" data-i18n="contributeIntro">Help others by adding a facility or a time-bound camp. Every submission is checked by a moderator before it appears on the map.</p>
+
+      <div class="choice-grid">
+        <button class="choice-card" id="chooseDrive">
+          <span class="choice-icon amber">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2v6M12 16v6M2 12h6M16 12h6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="choice-text">
+            <span class="choice-title" data-i18n="addDrive">Report a drive / camp</span>
+            <span class="choice-sub muted" data-i18n="addDriveSub">A time-bound camp, screening or outreach event</span>
+          </span>
+        </button>
+        <button class="choice-card" id="chooseFacility">
+          <span class="choice-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2 4 6v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V6l-8-4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="choice-text">
+            <span class="choice-title" data-i18n="addFacility">Report a facility</span>
+            <span class="choice-sub muted" data-i18n="addFacilitySub">A hospital, clinic, PHC or pharmacy</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="submissions-block">
+        <h2 class="section-heading" data-i18n="mySubmissions">My submissions</h2>
+        <div id="submissionsList"></div>
+        <p class="muted small hidden" id="noSubmissions" data-i18n="noSubmissions">You haven't submitted anything yet.</p>
+      </div>
+    </section>
+
+    <!-- STEP: drive form -->
+    <section id="stepDriveForm" class="panel hidden">
+      <button class="btn-text back-link" id="driveFormBack">‹ <span data-i18n="backToMap">Back</span></button>
+      <div class="field">
+        <label data-i18n="driveTitleLabel">Camp / drive title *</label>
+        <input type="text" id="d_title" data-i18n-placeholder="driveTitlePlaceholder" placeholder="e.g., Free Eye Check-up Camp">
+      </div>
+      <div class="field">
+        <label data-i18n="organiserLabel">Organiser name *</label>
+        <input type="text" id="d_organiser" data-i18n-placeholder="organiserPlaceholder" placeholder="e.g., Netra Jyoti Charitable Trust">
+      </div>
+      <div class="field">
+        <label data-i18n="locationLabel">Location</label>
+        <p class="field-help" data-i18n="locationRequiredHelp">Pinpoint location on the map before submitting.</p>
+        <button class="btn-secondary full" id="d_locateBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span id="d_locateLabel" data-i18n="useCurrentLocation">Use my current location</span>
+        </button>
+        <div class="picker-map" id="d_pickerMap"></div>
+        <p class="field-error hidden" id="d_locationError" role="alert"></p>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label data-i18n="dateLabel">Date *</label>
+          <input type="date" id="d_date">
+        </div>
+        <div class="field">
+          <label data-i18n="endDateLabel">End date *</label>
+          <input type="date" id="d_endDate">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label data-i18n="startTimeLabel">Start time *</label>
+          <input type="time" id="d_start">
+        </div>
+        <div class="field">
+          <label data-i18n="endTimeLabel">End time *</label>
+          <input type="time" id="d_end">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="venueLabel">Venue name *</label>
+        <input type="text" id="d_venue" data-i18n-placeholder="venuePlaceholder" placeholder="e.g., Community Hall">
+      </div>
+      <div class="field">
+        <label data-i18n="localityLabel">Address / locality</label>
+        <input type="text" id="d_address">
+        <div class="location-results hidden" id="d_locationResults"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="landmarkLabel">Landmark *</label>
+        <input type="text" id="d_landmark">
+        <p class="field-help" data-i18n="landmarkHelp">e.g., "opposite the Hanuman temple" — often more useful than the street address.</p>
+      </div>
+
+      <div class="field">
+        <label data-i18n="servicesLabel">Services offered *</label>
+        <div class="chip-select" id="d_services"></div>
+        <div class="other-service-field hidden" id="d_otherServiceWrap">
+          <label data-i18n="service_otherDetails">Please specify the other service *</label>
+          <input type="text" id="d_otherService">
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="costTypeLabel">Cost *</label>
+        <div class="chip-select single" id="d_cost">
+          <button type="button" class="chip-opt" data-value="FREE" data-i18n="free">Free</button>
+          <button type="button" class="chip-opt" data-value="SUBSIDISED" data-i18n="subsidised">Subsidised</button>
+          <button type="button" class="chip-opt" data-value="PAID" data-i18n="paid">Paid</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="eligibilityLabel2">Who can attend (optional)</label>
+        <input type="text" id="d_eligibility" data-i18n-placeholder="eligibilityPlaceholder">
+      </div>
+      <div class="field">
+        <label data-i18n="documentsLabel2">Documents needed (optional)</label>
+        <input type="text" id="d_documents" data-i18n-placeholder="documentsPlaceholder">
+      </div>
+
+      <div class="field">
+        <label data-i18n="registrationRequiredLabel">Registration required?</label>
+        <div class="chip-select single" id="d_regRequired">
+          <button type="button" class="chip-opt" data-value="yes" data-i18n="yes">Yes</button>
+          <button type="button" class="chip-opt" data-value="no" data-i18n="no">No</button>
+        </div>
+      </div>
+      <div class="field hidden" id="d_regDetailsWrap">
+        <label data-i18n="registrationDetailsLabel">Registration link or number</label>
+        <input type="text" id="d_regDetails">
+      </div>
+
+      <div class="field">
+        <label data-i18n="contactPhoneLabel">Contact phone number *</label>
+        <input type="tel" id="d_phone">
+      </div>
+
+      <div class="field">
+        <label data-i18n="photoEvidenceLabel">Photo of notice / banner *</label>
+        <p class="field-help" data-i18n="photoEvidenceHelp">Helps moderators verify this faster.</p>
+        <div class="upload-box" id="d_uploadBox">
+          <input type="file" id="d_photo" accept="image/*" class="upload-input">
+          <div class="upload-empty" id="d_uploadEmpty">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4 7 9M12 4l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span data-i18n="uploadPhoto">Upload photo</span>
+          </div>
+          <img class="upload-preview hidden" id="d_uploadPreview" alt="">
+        </div>
+      </div>
+
+      <button class="btn-primary full submit-btn" id="d_submit" data-i18n="submitDrive">Submit for review</button>
+    </section>
+
+    <!-- STEP: facility form -->
+    <section id="stepFacilityForm" class="panel hidden">
+      <button class="btn-text back-link" id="facilityFormBack">‹ <span data-i18n="backToMap">Back</span></button>
+      <div class="field">
+        <label data-i18n="facilityNameLabel">Facility name *</label>
+        <input type="text" id="f_name" data-i18n-placeholder="facilityNamePlaceholder">
+      </div>
+
+      <div class="field">
+        <label data-i18n="facilityTypeLabel">Facility type *</label>
+        <div class="chip-select single" id="f_type"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="locationLabel">Location</label>
+        <p class="field-help" data-i18n="locationRequiredHelp">Pinpoint location on the map before submitting.</p>
+        <button class="btn-secondary full" id="f_locateBtn" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span id="f_locateLabel" data-i18n="useCurrentLocation">Use my current location</span>
+        </button>
+        <div class="picker-map" id="f_pickerMap"></div>
+        <p class="field-error hidden" id="f_locationError" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label data-i18n="ownershipLabel">Ownership *</label>
+        <div class="chip-select single" id="f_ownership"></div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="localityLabel">Address / locality *</label>
+        <input type="text" id="f_address">
+        <div class="location-results hidden" id="f_locationResults"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="landmarkLabel">Landmark *</label>
+        <input type="text" id="f_landmark">
+        <p class="field-help" data-i18n="landmarkHelp">e.g., "opposite the Hanuman temple" — often more useful than the street address.</p>
+      </div>
+
+      <div class="field">
+        <label data-i18n="operatingHoursLabel">Operating hours *</label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="f_allDay">
+          <span data-i18n="allDayLabel">Open all day</span>
+        </label>
+        <div class="field-row" id="f_timeRange">
+          <div class="field">
+            <label data-i18n="openingTimeLabel">Opening time *</label>
+            <input type="time" id="f_openTime" required>
+          </div>
+          <div class="field">
+            <label data-i18n="closingTimeLabel">Closing time *</label>
+            <input type="time" id="f_closeTime" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="servicesLabel">Services offered *</label>
+        <div class="chip-select" id="f_services"></div>
+        <div class="other-service-field hidden" id="f_otherServiceWrap">
+          <label data-i18n="service_otherDetails">Please specify the other service *</label>
+          <input type="text" id="f_otherService">
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="costTypeLabel">Cost *</label>
+        <div class="chip-select single" id="f_cost">
+          <button type="button" class="chip-opt" data-value="FREE" data-i18n="free">Free</button>
+          <button type="button" class="chip-opt" data-value="SUBSIDISED" data-i18n="subsidised">Subsidised</button>
+          <button type="button" class="chip-opt" data-value="PAID" data-i18n="paid">Paid</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="schemesLabel">Government schemes empanelled</label>
+        <div class="chip-select" id="f_schemes"></div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="languagesSpokenLabel">Languages spoken at facility</label>
+        <div class="chip-select" id="f_languages"></div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="accessibilityLabel">Accessibility</label>
+        <div class="chip-select" id="f_accessibility">
+          <button type="button" class="chip-opt" data-value="wheelchair" data-i18n="wheelchairAccess">Wheelchair access</button>
+          <button type="button" class="chip-opt" data-value="femaleDoctor" data-i18n="femaleDoctor">Female doctor available</button>
+          <button type="button" class="chip-opt" data-value="womenOnly" data-i18n="womenOnly">Women-only services</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="contactPhoneLabel">Contact phone number *</label>
+        <input type="tel" id="f_phone">
+      </div>
+
+      <div class="field">
+        <label data-i18n="photoEvidenceLabelFacility">Photo of the facility (optional)</label>
+        <div class="upload-box" id="f_uploadBox">
+          <input type="file" id="f_photo" accept="image/*" class="upload-input">
+          <div class="upload-empty" id="f_uploadEmpty">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4 7 9M12 4l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <span data-i18n="uploadPhoto">Upload photo</span>
+          </div>
+          <img class="upload-preview hidden" id="f_uploadPreview" alt="">
+        </div>
+      </div>
+
+      <button class="btn-primary full submit-btn" id="f_submit" data-i18n="submitFacility">Submit for review</button>
+    </section>
+
+    <!-- STEP: confirmation -->
+    <section id="stepConfirm" class="panel hidden">
+      <div class="confirm-box">
+        <span class="confirm-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <h2 data-i18n="confirmationTitle">Thanks — submitted for review</h2>
+        <p class="muted" data-i18n="confirmationBody">A moderator will check this, usually within 24 hours, before it appears on the map.</p>
+        <button class="btn-primary full" id="submitAnotherBtn" data-i18n="submitAnother">Submit another</button>
+        <a class="btn-secondary full" href="index.html" data-i18n="backToMap">Back to map</a>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="disclaimer-bar">
+    <span data-i18n="disclaimer">Information only — not medical advice.</span>
+    <a class="emergency-link" href="tel:108">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span data-i18n="emergency">Emergency: 108</span>
+    </a>
+  </div>
+</div>
+
+<!-- Language picker -->
+<div class="sheet-overlay" id="langSheetOverlay">
+  <div class="sheet">
+    <h3 data-i18n="chooseLanguage">Choose your language</h3>
+    <div class="lang-grid">
+      <button class="lang-option" data-lang="en"><span class="lang-native">English</span><span class="lang-en">English</span></button>
+      <button class="lang-option" data-lang="hi"><span class="lang-native">हिन्दी</span><span class="lang-en">Hindi</span></button>
+      <button class="lang-option" data-lang="ta"><span class="lang-native">தமிழ்</span><span class="lang-en">Tamil</span></button>
+      <button class="lang-option" data-lang="bn"><span class="lang-native">বাংলা</span><span class="lang-en">Bengali</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="contribute-data.js"></script>
+<script src="contribute.js"></script>
+</body>
+</html>
